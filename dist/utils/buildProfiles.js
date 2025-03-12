@@ -2,37 +2,34 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildProfiles = buildProfiles;
 const discord_js_1 = require("discord.js");
+// Builds user profiles from messages
 async function buildProfiles(messages) {
     const profiles = {};
-    // loop through messages
     for (const message of messages) {
-        // add all users
         const author = message.author;
-        // add profile
         if (!profiles[author.id]) {
             profiles[author.id] = buildProfile(message.member, author);
         }
-        // add interaction users
         if (message.interaction) {
             const user = message.interaction.user;
             if (!profiles[user.id]) {
                 profiles[user.id] = buildProfile(null, user);
             }
         }
-        // threads
         if (message.thread && message.thread.lastMessage) {
             profiles[message.thread.lastMessage.author.id] = buildProfile(message.thread.lastMessage.member, message.thread.lastMessage.author);
         }
     }
     return profiles;
 }
+// Creates a profile for a user, including role badge if applicable
 function buildProfile(member, author) {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     let highestDisplayedRole;
     if (member) {
         highestDisplayedRole = member.roles.cache
-            .filter(role => role.hoist) // Select only roles that are "displayed"
-            .sort((a, b) => b.position - a.position) // Get the highest role
+            .filter(role => role.hoist) // Only select displayed roles
+            .sort((a, b) => b.position - a.position) // Get highest role
             .first();
     }
     return {

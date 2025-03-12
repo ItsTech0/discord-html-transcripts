@@ -1,29 +1,26 @@
 import { type GuildMember, type Message, type User, UserFlags, type Role } from 'discord.js';
 
 export type Profile = {
-  author: string; // author of the message
-  avatar?: string; // avatar of the author
-  roleColor?: string; // role color of the author
-  roleIcon?: string; // role icon of the author
-  roleName?: string; // role name of the author
+  author: string; // Author name with role badge (if applicable)
+  avatar?: string; // Author's avatar URL
+  roleColor?: string; // Color of the highest displayed role
+  roleIcon?: string; // Icon of the highest displayed role (if available)
+  roleName?: string; // Name of the highest displayed role
 
-  bot?: boolean; // is the author a bot
-  verified?: boolean; // is the author verified
+  bot?: boolean; // Whether the user is a bot
+  verified?: boolean; // Whether the user is a verified bot
 };
 
+// Builds user profiles from messages
 export async function buildProfiles(messages: Message[]) {
   const profiles: Record<string, Profile> = {};
 
-  // loop through messages
   for (const message of messages) {
-    // add all users
     const author = message.author;
-      // add profile
     if (!profiles[author.id]) {
       profiles[author.id] = buildProfile(message.member, author);
     }
 
-    // add interaction users
     if (message.interaction) {
       const user = message.interaction.user;
       if (!profiles[user.id]) {
@@ -31,7 +28,6 @@ export async function buildProfiles(messages: Message[]) {
       }
     }
 
-    // threads
     if (message.thread && message.thread.lastMessage) {
       profiles[message.thread.lastMessage.author.id] = buildProfile(
         message.thread.lastMessage.member,
@@ -43,13 +39,14 @@ export async function buildProfiles(messages: Message[]) {
   return profiles;
 }
 
+// Creates a profile for a user, including role badge if applicable
 function buildProfile(member: GuildMember | null, author: User): Profile {
   let highestDisplayedRole: Role | undefined;
 
   if (member) {
     highestDisplayedRole = member.roles.cache
-      .filter(role => role.hoist) // Select only roles that are "displayed"
-      .sort((a, b) => b.position - a.position) // Get the highest role
+      .filter(role => role.hoist) // Only select displayed roles
+      .sort((a, b) => b.position - a.position) // Get highest role
       .first();
   }
 
