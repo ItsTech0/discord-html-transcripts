@@ -12,15 +12,18 @@ export type Profile = {
 };
 
 // Builds user profiles from messages
-export async function buildProfiles(messages: Message[]) {
+export async function buildProfiles(messages: Message[]): Promise<Record<string, Profile>> {
   const profiles: Record<string, Profile> = {};
 
   for (const message of messages) {
     const author = message.author;
+    
+    // Ensure the author has a profile
     if (!profiles[author.id]) {
       profiles[author.id] = buildProfile(message.member, author);
     }
 
+    // If the message was from an interaction, process the interaction user
     if (message.interaction) {
       const user = message.interaction.user;
       if (!profiles[user.id]) {
@@ -28,6 +31,7 @@ export async function buildProfiles(messages: Message[]) {
       }
     }
 
+    // If the message was part of a thread, process the thread's last message author
     if (message.thread && message.thread.lastMessage) {
       profiles[message.thread.lastMessage.author.id] = buildProfile(
         message.thread.lastMessage.member,
@@ -43,10 +47,11 @@ export async function buildProfiles(messages: Message[]) {
 function buildProfile(member: GuildMember | null, author: User): Profile {
   let highestDisplayedRole: Role | undefined;
 
+  // If member exists, extract the highest displayed role
   if (member) {
     highestDisplayedRole = member.roles.cache
       .filter(role => role.hoist) // Only select displayed roles
-      .sort((a, b) => b.position - a.position) // Get highest role
+      .sort((a, b) => b.position - a.position) // Get the highest role
       .first();
   }
 
@@ -55,7 +60,7 @@ function buildProfile(member: GuildMember | null, author: User): Profile {
       ? `<span style="background-color:${highestDisplayedRole.hexColor}; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${highestDisplayedRole.name}</span> ${member?.nickname ?? author.displayName ?? author.username}`
       : member?.nickname ?? author.displayName ?? author.username,
     avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
-    roleColor: highestDisplayedRole?.hexColor,
+    roleColor: highestDisplayedRole?.hexColor ?? undefined,
     roleIcon: highestDisplayedRole?.iconURL() ?? undefined,
     roleName: highestDisplayedRole?.name ?? undefined,
     bot: author.bot,
