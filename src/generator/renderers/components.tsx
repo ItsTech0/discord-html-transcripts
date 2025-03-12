@@ -26,7 +26,7 @@ export function Component({ component, id }: { component: MessageActionRowCompon
     return (
       <DiscordButton
         key={id}
-        type={ButtonStyleMapping[component.style]}
+        type={ButtonStyleMapping[component.style as keyof typeof ButtonStyleMapping] || "secondary"}
         url={component.url ?? undefined}
         emoji={component.emoji ? parseDiscordEmoji(component.emoji) : undefined}
       >
