@@ -1,10 +1,10 @@
-import { type GuildMember, type Message, type User, UserFlags } from 'discord.js';
+import { type GuildMember, type Message, type User, UserFlags, type Role } from 'discord.js';
 
 export type Profile = {
   author: string; // author of the message
   avatar?: string; // avatar of the author
   roleColor?: string; // role color of the author
-  roleIcon?: string; // role color of the author
+  roleIcon?: string; // role icon of the author
   roleName?: string; // role name of the author
 
   bot?: boolean; // is the author a bot
@@ -18,8 +18,8 @@ export async function buildProfiles(messages: Message[]) {
   for (const message of messages) {
     // add all users
     const author = message.author;
-    if (!profiles[author.id]) {
       // add profile
+    if (!profiles[author.id]) {
       profiles[author.id] = buildProfile(message.member, author);
     }
 
@@ -40,17 +40,27 @@ export async function buildProfiles(messages: Message[]) {
     }
   }
 
-  // return as a JSON
   return profiles;
 }
 
-function buildProfile(member: GuildMember | null, author: User) {
+function buildProfile(member: GuildMember | null, author: User): Profile {
+  let highestDisplayedRole: Role | undefined;
+
+  if (member) {
+    highestDisplayedRole = member.roles.cache
+      .filter(role => role.hoist) // Select only roles that are "displayed"
+      .sort((a, b) => b.position - a.position) // Get the highest role
+      .first();
+  }
+
   return {
-    author: member?.nickname ?? author.displayName ?? author.username,
+    author: highestDisplayedRole
+      ? `<span style="background-color:${highestDisplayedRole.hexColor}; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${highestDisplayedRole.name}</span> ${member?.nickname ?? author.displayName ?? author.username}`
+      : member?.nickname ?? author.displayName ?? author.username,
     avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
-    roleColor: member?.displayHexColor,
-    roleIcon: member?.roles.icon?.iconURL() ?? undefined,
-    roleName: member?.roles.hoist?.name ?? undefined,
+    roleColor: highestDisplayedRole?.hexColor,
+    roleIcon: highestDisplayedRole?.iconURL() ?? undefined,
+    roleName: highestDisplayedRole?.name ?? undefined,
     bot: author.bot,
     verified: author.flags?.has(UserFlags.VerifiedBot),
   };
