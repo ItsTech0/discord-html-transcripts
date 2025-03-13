@@ -5,6 +5,7 @@ export type Profile = {
     roleColor?: string;
     roleIcon?: string;
     roleName?: string;
+    roleTag?: string;
     bot?: boolean;
     verified?: boolean;
 };

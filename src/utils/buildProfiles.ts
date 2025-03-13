@@ -1,29 +1,25 @@
-import { type GuildMember, type Message, type User, UserFlags, type Role } from 'discord.js';
+import { type GuildMember, type Message, type User, UserFlags, Role } from 'discord.js';
 
 export type Profile = {
-  author: string; // Author name with role badge (if applicable)
-  avatar?: string; // Author's avatar URL
-  roleColor?: string; // Color of the highest displayed role
-  roleIcon?: string; // Icon of the highest displayed role (if available)
-  roleName?: string; // Name of the highest displayed role
-
-  bot?: boolean; // Whether the user is a bot
-  verified?: boolean; // Whether the user is a verified bot
+  author: string; // Author of the message
+  avatar?: string; // Avatar of the author
+  roleColor?: string; // Role color of the author
+  roleIcon?: string; // Role icon of the author
+  roleName?: string; // Role name of the author
+  roleTag?: string; // Role tag for display before the username
+  bot?: boolean; // Whether the author is a bot
+  verified?: boolean; // Whether the author is verified
 };
 
-// Builds user profiles from messages
-export async function buildProfiles(messages: Message[]): Promise<Record<string, Profile>> {
+export async function buildProfiles(messages: Message[]) {
   const profiles: Record<string, Profile> = {};
 
   for (const message of messages) {
     const author = message.author;
-    
-    // Ensure the author has a profile
     if (!profiles[author.id]) {
       profiles[author.id] = buildProfile(message.member, author);
     }
 
-    // If the message was from an interaction, process the interaction user
     if (message.interaction) {
       const user = message.interaction.user;
       if (!profiles[user.id]) {
@@ -31,7 +27,6 @@ export async function buildProfiles(messages: Message[]): Promise<Record<string,
       }
     }
 
-    // If the message was part of a thread, process the thread's last message author
     if (message.thread && message.thread.lastMessage) {
       profiles[message.thread.lastMessage.author.id] = buildProfile(
         message.thread.lastMessage.member,
@@ -43,27 +38,26 @@ export async function buildProfiles(messages: Message[]): Promise<Record<string,
   return profiles;
 }
 
-// Creates a profile for a user, including role badge if applicable
 function buildProfile(member: GuildMember | null, author: User): Profile {
   let highestDisplayedRole: Role | undefined;
 
-  // If member exists, extract the highest displayed role
   if (member) {
     highestDisplayedRole = member.roles.cache
-      .filter(role => role.hoist) // Only select displayed roles
-      .sort((a, b) => b.position - a.position) // Get the highest role
+      .filter(role => role.hoist) // Only select roles that are "displayed separately"
+      .sort((a, b) => b.position - a.position) // Sort by highest position
       .first();
   }
 
   return {
-    author: highestDisplayedRole
-      ? `<span style="background-color:${highestDisplayedRole.hexColor}; color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${highestDisplayedRole.name}</span> ${member?.nickname ?? author.displayName ?? author.username}`
-      : member?.nickname ?? author.displayName ?? author.username,
+    author: member?.nickname ?? author.displayName ?? author.username,
     avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
-    roleColor: highestDisplayedRole?.hexColor ?? undefined,
+    roleColor: highestDisplayedRole?.hexColor,
     roleIcon: highestDisplayedRole?.iconURL() ?? undefined,
     roleName: highestDisplayedRole?.name ?? undefined,
     bot: author.bot,
     verified: author.flags?.has(UserFlags.VerifiedBot),
+    roleTag: highestDisplayedRole
+      ? `<span style="background-color:${highestDisplayedRole.hexColor}; color:white; padding:3px 6px; border-radius:4px; font-size:12px;">${highestDisplayedRole.name}</span>`
+      : ''
   };
 }
