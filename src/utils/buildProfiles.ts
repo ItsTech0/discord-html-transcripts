@@ -1,14 +1,15 @@
 import { type GuildMember, type Message, type User, UserFlags, Role } from 'discord.js';
+import React, { ReactElement } from 'react';
 
 export type Profile = {
-  author: string; // Author of the message
-  avatar?: string; // Avatar of the author
-  roleColor?: string; // Role color of the author
-  roleIcon?: string; // Role icon of the author
-  roleName?: string; // Role name of the author
-  roleTag?: string; // Role tag for display before the username
-  bot?: boolean; // Whether the author is a bot
-  verified?: boolean; // Whether the author is verified
+  author: string;
+  avatar?: string;
+  roleColor?: string;
+  roleIcon?: string;
+  roleName?: string;
+  roleTag?: string;
+  bot?: boolean;
+  verified?: boolean;
 };
 
 export async function buildProfiles(messages: Message[]) {
@@ -27,7 +28,7 @@ export async function buildProfiles(messages: Message[]) {
       }
     }
 
-    if (message.thread && message.thread.lastMessage) {
+    if (message.thread?.lastMessage) {
       profiles[message.thread.lastMessage.author.id] = buildProfile(
         message.thread.lastMessage.member,
         message.thread.lastMessage.author
@@ -43,21 +44,52 @@ function buildProfile(member: GuildMember | null, author: User): Profile {
 
   if (member) {
     highestDisplayedRole = member.roles.cache
-      .filter(role => role.hoist) // Only select roles that are "displayed separately"
-      .sort((a, b) => b.position - a.position) // Sort by highest position
+      .filter((role) => role.hoist)
+      .sort((a, b) => b.position - a.position)
       .first();
   }
 
   return {
-    author: member?.nickname ?? author.displayName ?? author.username,
+    author: member?.nickname ?? author.globalName ?? author.username,
     avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
     roleColor: highestDisplayedRole?.hexColor,
     roleIcon: highestDisplayedRole?.iconURL() ?? undefined,
     roleName: highestDisplayedRole?.name ?? undefined,
     bot: author.bot,
-    verified: author.flags?.has(UserFlags.VerifiedBot),
-    roleTag: highestDisplayedRole
-      ? `<span style="background-color:${highestDisplayedRole.hexColor}; color:white; padding:3px 6px; border-radius:4px; font-size:12px;">${highestDisplayedRole.name}</span>`
-      : ''
+    verified: author.flags?.has(UserFlags.VerifiedBot) ?? false,
+    roleTag: highestDisplayedRole?.name ?? '',
   };
+}
+
+interface ExtendedMessage extends Message {
+  profile?: Profile;
+}
+
+interface DiscordMessageProps {
+  message: ExtendedMessage;
+}
+
+export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
+  return React.createElement(
+    'div',
+    { className: 'discord-message' },
+    message.profile?.roleTag
+      ? React.createElement(
+          'span',
+          {
+            className: 'role-badge',
+            style: {
+              backgroundColor: message.profile.roleColor || 'transparent',
+              color: 'white',
+              padding: '3px 6px',
+              borderRadius: '4px',
+              fontSize: '12px',
+            },
+          },
+          message.profile.roleTag
+        )
+      : null,
+    React.createElement('span', { className: 'author' }, message.profile?.author),
+    React.createElement('div', { className: 'content' }, message.content)
+  );
 }
