@@ -49,23 +49,22 @@ function buildProfile(member, author) {
     };
 }
 function DiscordMessage({ message }) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     console.log(`Rendering message from ${(_a = message.profile) === null || _a === void 0 ? void 0 : _a.author}, Role Tag: ${(_b = message.profile) === null || _b === void 0 ? void 0 : _b.roleTag}`);
-    return react_1.default.createElement('div', { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } }, react_1.default.createElement('span', { className: 'author', style: { display: 'flex', alignItems: 'center' } }, ((_c = message.profile) === null || _c === void 0 ? void 0 : _c.roleTag)
+    return react_1.default.createElement('div', { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } }, react_1.default.createElement('div', { className: 'author', style: { display: 'flex', alignItems: 'center', gap: '6px' } }, ((_c = message.profile) === null || _c === void 0 ? void 0 : _c.roleTag)
         ? react_1.default.createElement('span', {
             className: 'role-badge',
             style: {
                 backgroundColor: message.profile.roleColor || '#5865F2',
                 color: 'white',
-                padding: '3px 6px',
+                padding: '2px 6px',
                 borderRadius: '4px',
                 fontSize: '12px',
-                marginRight: '6px',
+                fontWeight: 'bold',
                 display: 'inline-flex',
                 alignItems: 'center',
-                fontWeight: 'bold',
             },
         }, message.profile.roleTag)
-        : null, react_1.default.createElement('span', { style: { marginLeft: '6px' } }, (_d = message.profile) === null || _d === void 0 ? void 0 : _d.author)), react_1.default.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content));
+        : null, react_1.default.createElement('span', { className: 'username', style: { color: ((_d = message.profile) === null || _d === void 0 ? void 0 : _d.roleColor) || '#fff', fontWeight: 'bold' } }, (_e = message.profile) === null || _e === void 0 ? void 0 : _e.author)), react_1.default.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content));
 }
 //# sourceMappingURL=buildProfiles.js.map

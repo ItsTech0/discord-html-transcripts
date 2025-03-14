@@ -73,13 +73,13 @@ interface DiscordMessageProps {
 
 export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
   console.log(`Rendering message from ${message.profile?.author}, Role Tag: ${message.profile?.roleTag}`);
-  
+
   return React.createElement(
     'div',
     { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } },
     React.createElement(
-      'span',
-      { className: 'author', style: { display: 'flex', alignItems: 'center' } },
+      'div',
+      { className: 'author', style: { display: 'flex', alignItems: 'center', gap: '6px' } },
       message.profile?.roleTag
         ? React.createElement(
             'span',
@@ -88,19 +88,22 @@ export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
               style: {
                 backgroundColor: message.profile.roleColor || '#5865F2',
                 color: 'white',
-                padding: '3px 6px',
+                padding: '2px 6px',
                 borderRadius: '4px',
                 fontSize: '12px',
-                marginRight: '6px',
+                fontWeight: 'bold',
                 display: 'inline-flex',
                 alignItems: 'center',
-                fontWeight: 'bold',
               },
             },
             message.profile.roleTag
           )
         : null,
-      React.createElement('span', { style: { marginLeft: '6px' } }, message.profile?.author)
+      React.createElement(
+        'span',
+        { className: 'username', style: { color: message.profile?.roleColor || '#fff', fontWeight: 'bold' } },
+        message.profile?.author
+      )
     ),
     React.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content)
   );
