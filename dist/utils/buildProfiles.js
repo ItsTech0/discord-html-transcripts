@@ -49,7 +49,7 @@ function buildProfile(member, author) {
 }
 function DiscordMessage({ message }) {
     var _a, _b;
-    return react_1.default.createElement('div', { className: 'discord-message' }, ((_a = message.profile) === null || _a === void 0 ? void 0 : _a.roleTag)
+    return react_1.default.createElement('div', { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } }, ((_a = message.profile) === null || _a === void 0 ? void 0 : _a.roleTag)
         ? react_1.default.createElement('span', {
             className: 'role-badge',
             style: {
@@ -58,8 +58,9 @@ function DiscordMessage({ message }) {
                 padding: '3px 6px',
                 borderRadius: '4px',
                 fontSize: '12px',
+                marginRight: '8px',
             },
         }, message.profile.roleTag)
-        : null, react_1.default.createElement('span', { className: 'author' }, (_b = message.profile) === null || _b === void 0 ? void 0 : _b.author), react_1.default.createElement('div', { className: 'content' }, message.content));
+        : null, react_1.default.createElement('span', { className: 'author' }, (_b = message.profile) === null || _b === void 0 ? void 0 : _b.author), react_1.default.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content));
 }
 //# sourceMappingURL=buildProfiles.js.map

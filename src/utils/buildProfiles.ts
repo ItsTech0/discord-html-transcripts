@@ -72,7 +72,7 @@ interface DiscordMessageProps {
 export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
   return React.createElement(
     'div',
-    { className: 'discord-message' },
+    { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } },
     message.profile?.roleTag
       ? React.createElement(
           'span',
@@ -84,12 +84,13 @@ export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
               padding: '3px 6px',
               borderRadius: '4px',
               fontSize: '12px',
+              marginRight: '8px',
             },
           },
           message.profile.roleTag
         )
       : null,
     React.createElement('span', { className: 'author' }, message.profile?.author),
-    React.createElement('div', { className: 'content' }, message.content)
+    React.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content)
   );
 }
