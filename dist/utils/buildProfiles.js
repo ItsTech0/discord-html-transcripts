@@ -28,7 +28,7 @@ async function buildProfiles(messages) {
     return profiles;
 }
 function buildProfile(member, author) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     let highestDisplayedRole;
     if (member) {
         highestDisplayedRole = member.roles.cache
@@ -36,31 +36,36 @@ function buildProfile(member, author) {
             .sort((a, b) => b.position - a.position)
             .first();
     }
+    console.log(`User: ${author.username}, Role: ${(_a = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.name) !== null && _a !== void 0 ? _a : 'None'}`);
     return {
-        author: (_b = (_a = member === null || member === void 0 ? void 0 : member.nickname) !== null && _a !== void 0 ? _a : author.globalName) !== null && _b !== void 0 ? _b : author.username,
-        avatar: (_c = member === null || member === void 0 ? void 0 : member.displayAvatarURL({ size: 64 })) !== null && _c !== void 0 ? _c : author.displayAvatarURL({ size: 64 }),
+        author: (_c = (_b = member === null || member === void 0 ? void 0 : member.nickname) !== null && _b !== void 0 ? _b : author.globalName) !== null && _c !== void 0 ? _c : author.username,
+        avatar: (_d = member === null || member === void 0 ? void 0 : member.displayAvatarURL({ size: 64 })) !== null && _d !== void 0 ? _d : author.displayAvatarURL({ size: 64 }),
         roleColor: highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.hexColor,
-        roleIcon: (_d = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.iconURL()) !== null && _d !== void 0 ? _d : undefined,
-        roleName: (_e = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.name) !== null && _e !== void 0 ? _e : undefined,
+        roleIcon: (_e = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.iconURL()) !== null && _e !== void 0 ? _e : undefined,
+        roleName: (_f = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.name) !== null && _f !== void 0 ? _f : undefined,
         bot: author.bot,
-        verified: (_g = (_f = author.flags) === null || _f === void 0 ? void 0 : _f.has(discord_js_1.UserFlags.VerifiedBot)) !== null && _g !== void 0 ? _g : false,
-        roleTag: (_h = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.name) !== null && _h !== void 0 ? _h : '',
+        verified: (_h = (_g = author.flags) === null || _g === void 0 ? void 0 : _g.has(discord_js_1.UserFlags.VerifiedBot)) !== null && _h !== void 0 ? _h : false,
+        roleTag: (_j = highestDisplayedRole === null || highestDisplayedRole === void 0 ? void 0 : highestDisplayedRole.name) !== null && _j !== void 0 ? _j : '',
     };
 }
 function DiscordMessage({ message }) {
-    var _a, _b;
-    return react_1.default.createElement('div', { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } }, ((_a = message.profile) === null || _a === void 0 ? void 0 : _a.roleTag)
+    var _a, _b, _c, _d;
+    console.log(`Rendering message from ${(_a = message.profile) === null || _a === void 0 ? void 0 : _a.author}, Role Tag: ${(_b = message.profile) === null || _b === void 0 ? void 0 : _b.roleTag}`);
+    return react_1.default.createElement('div', { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } }, react_1.default.createElement('span', { className: 'author', style: { display: 'flex', alignItems: 'center' } }, ((_c = message.profile) === null || _c === void 0 ? void 0 : _c.roleTag)
         ? react_1.default.createElement('span', {
             className: 'role-badge',
             style: {
-                backgroundColor: message.profile.roleColor || 'transparent',
+                backgroundColor: message.profile.roleColor || '#5865F2',
                 color: 'white',
                 padding: '3px 6px',
                 borderRadius: '4px',
                 fontSize: '12px',
-                marginRight: '8px',
+                marginRight: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontWeight: 'bold',
             },
         }, message.profile.roleTag)
-        : null, react_1.default.createElement('span', { className: 'author' }, (_b = message.profile) === null || _b === void 0 ? void 0 : _b.author), react_1.default.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content));
+        : null, react_1.default.createElement('span', { style: { marginLeft: '6px' } }, (_d = message.profile) === null || _d === void 0 ? void 0 : _d.author)), react_1.default.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content));
 }
 //# sourceMappingURL=buildProfiles.js.map

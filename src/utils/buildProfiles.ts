@@ -49,6 +49,8 @@ function buildProfile(member: GuildMember | null, author: User): Profile {
       .first();
   }
 
+  console.log(`User: ${author.username}, Role: ${highestDisplayedRole?.name ?? 'None'}`);
+
   return {
     author: member?.nickname ?? author.globalName ?? author.username,
     avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
@@ -70,27 +72,36 @@ interface DiscordMessageProps {
 }
 
 export function DiscordMessage({ message }: DiscordMessageProps): ReactElement {
+  console.log(`Rendering message from ${message.profile?.author}, Role Tag: ${message.profile?.roleTag}`);
+  
   return React.createElement(
     'div',
     { className: 'discord-message', style: { display: 'flex', alignItems: 'center' } },
-    message.profile?.roleTag
-      ? React.createElement(
-          'span',
-          {
-            className: 'role-badge',
-            style: {
-              backgroundColor: message.profile.roleColor || 'transparent',
-              color: 'white',
-              padding: '3px 6px',
-              borderRadius: '4px',
-              fontSize: '12px',
-              marginRight: '8px',
+    React.createElement(
+      'span',
+      { className: 'author', style: { display: 'flex', alignItems: 'center' } },
+      message.profile?.roleTag
+        ? React.createElement(
+            'span',
+            {
+              className: 'role-badge',
+              style: {
+                backgroundColor: message.profile.roleColor || '#5865F2',
+                color: 'white',
+                padding: '3px 6px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                marginRight: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontWeight: 'bold',
+              },
             },
-          },
-          message.profile.roleTag
-        )
-      : null,
-    React.createElement('span', { className: 'author' }, message.profile?.author),
+            message.profile.roleTag
+          )
+        : null,
+      React.createElement('span', { style: { marginLeft: '6px' } }, message.profile?.author)
+    ),
     React.createElement('div', { className: 'content', style: { marginLeft: '8px' } }, message.content)
   );
 }
